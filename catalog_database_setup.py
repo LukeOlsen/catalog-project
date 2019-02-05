@@ -5,6 +5,24 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 Base = declarative_base()
 
+class ClothingGroup(Base):
+    __tablename__ = 'clothing_group'
 
-engine = create_engine('sqlite:///restaurantmenu.db')
+    name = Column(String(40), nullable = False)
+    id = Column(Integer, primary_key = True)
+
+class ClothingItem(Base):
+    __tablename__ = 'clothing_item'
+
+    name =  Column(String(80), nullable = False)
+    id = Column(Integer, primary_key = True)
+    description = Column(String(120))
+    size = Column(String(10))
+    color = Column(String(20))
+    price = Column(String(8))
+    item_group_id = Column(Integer, ForeignKey('clothing_group.id'))
+    clothing_group = relationship(ClothingGroup)
+
+
+engine = create_engine('sqlite:///clothingstore.db')
 Base.metadata.create_all(engine)
