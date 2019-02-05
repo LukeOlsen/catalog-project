@@ -20,6 +20,12 @@ def renderItemGroups():
     item_groups = session.query(ClothingGroup).all()
     return render_template('groups.html', item_groups = item_groups)
 
+@app.route('/clothing/<int:clothing_group_id>')
+def renderItemGroupList(clothing_group_id):
+    item_group = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
+    items = session.query(ClothingItem).filter_by(item_group_id = item_group.id)
+    return render_template('itemlist.html', items = items)
+
 if __name__ == '__main__':
     app.secret_key = 'super_secret_key'
     app.debug = True
