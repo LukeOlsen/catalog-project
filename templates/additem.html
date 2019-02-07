@@ -1,5 +1,29 @@
 <html>
     <body>
-        <h1>Add item here</h1>
+        <h1>Add a new item in {{clothing_group.name}}</h1>
+        <form action="{{url_for('addNewItem', clothing_goup_id = clothing_group.id) }}" method='POST'>
+
+            <p>Name:</p>
+
+            <input type="text" size='30' name='name'>
+
+            <p>Description:</p>
+
+            <input type="text" size='30' name='description'>
+
+            <p>Price:</p>
+
+            <input type="number" size='30' name='price'>
+
+            <p>Size:</p>
+
+            <input type="text" size='30' name='size'>
+
+            <p>Color:</p>
+
+            <input type="text" size="30" name="color">
+
+            <input type='submit' value='Create'>
+        </form>
     </body>
 </html>

@@ -1,5 +1,13 @@
 <html>
     <body>
-        <h1>Hello world</h1>
+        <h1>Add new item group.</h1>
+
+        <form action="{{url_for('addNewItemGroup')}}" method='POST'>
+
+            <input type="text" size="30" name="name" >
+
+            <input type="submit" value="Create">
+
+        </form>
     </body>
 </html>

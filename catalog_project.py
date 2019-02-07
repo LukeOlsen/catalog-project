@@ -15,7 +15,7 @@ session = DBSession()
 def sayHello():
     return render_template('hello.html')
 
-@app.route('/clothing')
+@app.route('/clothing/')
 def renderItemGroups():
     item_groups = session.query(ClothingGroup).all()
     return render_template('groups.html', item_groups = item_groups)
@@ -26,23 +26,31 @@ def renderItemGroupList(clothing_group_id):
     items = session.query(ClothingItem).filter_by(item_group_id = item_group.id)
     return render_template('itemlist.html', items = items)
 
-@app.route('clothing/<int:clothing_group_id>/<int:item_id>/')
-def renderItem(clothing_group_id, item_id):
-    return render_template('item.html', clothing_group_id = clothing_group_id, item_id = item_id)
+@app.route('/clothing/item/<int:item_id>/')
+def renderItem(item_id):
+    item = session.query(ClothingItem).filter_by(id=item_id).one()
+    return render_template('item.html', item = item)
 
 @app.route('/clothing/newItemGroup/', methods=['GET', 'POST'])
 def addNewItemGroup():
     if request.method == 'POST':
-        pass
+        newItemGroup = ClothingGroup(name = request.form['name'])
+        session.add(newItemGroup)
+        session.commit()
+        return redirect(url_for('renderItemGroups'))
     else:
         return render_template('additemgroup.html')
 
 @app.route('/clothing/<int:clothing_group_id>/newItem', methods=['GET', 'POST'])
 def addNewItem(clothing_group_id):
+    clothing_group = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
     if request.method == 'POST':
-        pass
+        newItem = ClothingItem(name=request.form['name'], description=request.form['description'], price=request.form['price'],
+                               size=request.form['size'], color=request.form['color'], item_group_id = clothing_group_id)
+        session.add(newItem)
+        session.commit()
     else: 
-        return render_template('additem.html')
+        return render_template('additem.html', clothing_group = clothing_group)
 
 @app.route('/clothing/<int:clothing_group_id>/edit', methods=['GET', 'POST'])
 def editItemGroup(clothing_group_id):
