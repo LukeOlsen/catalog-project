@@ -5,8 +5,7 @@
         {% for i in items%}
         <div>
             <p>{{i.name}}</p>
-            <p>{{i.description}}</p>
-            <p>{{i.id}}</p>
+            <p>see more <a href="{{url_for('renderItem', item_id=i.id)}}">here</a></p>
         </div>
         {% endfor %}
     </body>

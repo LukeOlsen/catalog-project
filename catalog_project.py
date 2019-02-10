@@ -5,7 +5,7 @@ from catalog_database_setup import Base, ClothingGroup, ClothingItem
 
 app = Flask(__name__)
 
-engine = create_engine('sqlite:///clothingstore.db')
+engine = create_engine('sqlite:///clothingstore.db?check_same_thread=False')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
@@ -55,28 +55,50 @@ def addNewItem(clothing_group_id):
 @app.route('/clothing/<int:clothing_group_id>/edit', methods=['GET', 'POST'])
 def editItemGroup(clothing_group_id):
     if request.method == 'POST':
-        pass
+        itemGroup = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
+        itemGroup.name = request.form['name']
+        session.add(itemGroup)
+        session.commit()
     else: 
         return render_template('editgroup.html')
 
 @app.route('/clothing/<int:clothing_group_id>/<int:item_id>/edit', methods=['GET', 'POST'])
 def editItem(clothing_group_id, item_id):
     if request.method == 'POST':
-        pass
+        changedItem = session.query(ClothingItem).filter_by(id = item_id).one()
+        if request.form['name']:
+            changedItem.name = request.form['name']
+        if request.form['description']:
+            changedItem.description = request.form['description']
+        if request.form['size']:
+            changedItem.size = request.form['size']
+        if request.form['color']:
+            changedItem.color = request.form['color']
+        if request.form['price']:
+            changedItem.price = request.form['price']
+        session.add(changedItem)
+        session.commit()
+        redirect(url_for('renderItem', item_id = changedItem.id))
     else: 
         return render_template('edititem.html')
 
 @app.route('/clothing/<int:clothing_group_id>/delete', methods=['GET', 'POST'])
 def deleteItemGroup(clothing_group_id):
     if request.method == 'POST':
-        pass
+        deletedItem = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
+        session.delete(deletedItem)
+        session.commit()
+        return redirect(url_for('renderItemGroups'))
     else: 
         return render_template('deleteitemgroup.html')
 
 @app.route('/clothing/<int:clothing_group_id>/<int:item_id>/delete', methods=['GET', 'POST'])
 def deleteItem(clothing_group_id, item_id):
     if request.method == 'POST':
-        pass
+        deletedItem = session.query(ClothingItem).filter_by(id = item_id).one()
+        session.delete(deletedItem)
+        session.commit()
+        return redirect(url_for('renderItemGroupList', clothing_group_id = clothing_group_id))
     else:
         return render_template('deleteitem.html')
 
