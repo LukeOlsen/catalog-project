@@ -1,5 +1,8 @@
 <html>
     <body>
-        <h1>Hello world delete item group.</h1>
+        <h1>Do you want to delete the group {{itemGroup.name}}</h1>
+        <form action="{{url_for('deleteItemGroup', clothing_group_id = itemGroup.id)}}" method="POST">
+            <input type="submit" value="Delete">
+        </form>
     </body>
 </html>

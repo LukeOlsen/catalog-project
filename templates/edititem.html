@@ -1,5 +1,12 @@
 <html>
     <body>
-        <h1>Hello edit item world.</h1>
+        <h1>Would you like to edit {{item.name}}?</h1>
+        <form action="{{url_for('editItem', item_id=item.id)}}", method="POST">
+            <input type="text" size="30" name="name" placeholder="{{item.name}}">
+            <input type="text" size="300" name="description" placeholder="{{item.description}}">
+            <input type="text" size="10" name="price" placeholder="{{item.price}}">
+            <input type="text" size="10" name="color" placeholder="{{item.color}}">
+            <input type="text" size="10" name="size" placeholder="{{item.size}}">
+        </form>
     </body>
 </html>
