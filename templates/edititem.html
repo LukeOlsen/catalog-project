@@ -8,5 +8,6 @@
             <input type="text" size="10" name="color" placeholder="{{item.color}}">
             <input type="text" size="10" name="size" placeholder="{{item.size}}">
         </form>
+        <a href="{{url_for('renderItem', item_id = item.id)}}">Back to item</a>
     </body>
 </html>
