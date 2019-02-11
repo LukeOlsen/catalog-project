@@ -23,10 +23,10 @@ def renderItemGroups():
 @app.route('/clothing/<int:clothing_group_id>/')
 def renderItemGroupList(clothing_group_id):
     item_group = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
-    items = session.query(ClothingItem).filter_by(item_group_id = item_group.id)
+    items = session.query(ClothingItem).filter_by(item_group_id=clothing_group_id).all()
     return render_template('itemlist.html', items = items, item_group = item_group)
 
-@app.route('/clothing/<int:clothing_group_id>/<int:item_id>/')
+@app.route('/clothing/item/<int:item_id>/')
 def renderSingleItem(item_id):
     item = session.query(ClothingItem).filter_by(id=item_id).one()
     return render_template('item.html', item = item)
