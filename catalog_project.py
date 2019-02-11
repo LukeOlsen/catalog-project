@@ -49,18 +49,20 @@ def addNewItem(clothing_group_id):
                                size=request.form['size'], color=request.form['color'], item_group_id = clothing_group_id)
         session.add(newItem)
         session.commit()
+        return redirect(url_for('renderItemGroupList', clothing_group_id = clothing_group.id))
     else: 
         return render_template('additem.html', clothing_group = clothing_group)
 
 @app.route('/clothing/<int:clothing_group_id>/edit', methods=['GET', 'POST'])
 def editItemGroup(clothing_group_id):
+    itemGroup = session.query(ClothingGroup).filter_by(id=clothing_group_id).one()
     if request.method == 'POST':
-        itemGroup = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
         itemGroup.name = request.form['name']
         session.add(itemGroup)
         session.commit()
+        return redirect(url_for('renderItemGroups'))
     else: 
-        return render_template('editgroup.html')
+        return render_template('editgroup.html', itemGroup = itemGroup)
 
 @app.route('/clothing/item/<int:item_id>/edit', methods=['GET', 'POST'])
 def editItem(item_id):
@@ -78,7 +80,7 @@ def editItem(item_id):
             changedItem.price = request.form['price']
         session.add(changedItem)
         session.commit()
-        redirect(url_for('renderItem', item_id = changedItem.id))
+        return redirect(url_for('renderSingleItem', item_id = changedItem.id))
     else: 
         return render_template('edititem.html', item = changedItem)
 
@@ -92,16 +94,15 @@ def deleteItemGroup(clothing_group_id):
     else: 
         return render_template('deleteitemgroup.html', itemGroup = deletedItemGroup)
 
-@app.route('/clothing/<int:clothing_group_id>/<int:item_id>/delete', methods=['GET', 'POST'])
-def deleteItem(clothing_group_id, item_id):
+@app.route('/clothing/item/<int:item_id>/delete', methods=['GET', 'POST'])
+def deleteItem(item_id):
     deletedItem = session.query(ClothingItem).filter_by(id = item_id).one()
-    itemGroup = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
     if request.method == 'POST':
         session.delete(deletedItem)
         session.commit()
-        return redirect(url_for('renderItemGroupList', clothing_group_id = clothing_group_id))
+        return redirect(url_for('renderItemGroupList', clothing_group_id = deletedItem.item_group_id))
     else:
-        return render_template('deleteitem.html', item=deleteItem, itemGroup = itemGroup)
+        return render_template('deleteitem.html', item=deletedItem)
 
 
 if __name__ == '__main__':

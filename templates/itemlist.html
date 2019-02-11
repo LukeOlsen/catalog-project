@@ -1,6 +1,7 @@
 <html>
     <body>
         <h1>A list of the items in the group</h1>
+        <p>{{items[0].item_group_id}}</p>
 
         {% for i in items%}
         <div>
@@ -8,5 +9,7 @@
             <p>see more <a href="{{url_for('renderSingleItem', item_id=i.id)}}">here</a></p>
         </div>
         {% endfor %}
+        <a href="{{url_for('addNewItem', clothing_group_id = items[0].item_group_id)}}">Make new item.</a>
+        <a href="{{url_for('renderItemGroups')}}">Back to categories</a>
     </body>
 </html>

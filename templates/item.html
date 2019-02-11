@@ -6,5 +6,7 @@
         <h4>{{item.size}}</h4>
         <h4>{{item.color}}</h4>
         <a href="{{url_for('renderItemGroupList', clothing_group_id = item.item_group_id)}}">Back to categories</a>
+        <a href="{{url_for('editItem', item_id = item.id)}}">Edit Item</a>
+        <a href="{{url_for('deleteItem', item_id = item.id)}}">Delete Item</a>
     </body>
 </html>

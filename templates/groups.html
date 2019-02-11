@@ -4,7 +4,6 @@
         {% for i in item_groups %}
         <div>
             <p>{{i.name}}</p>
-            <p>{{i.id}}</p>
             <a href="{{url_for('renderItemGroupList', clothing_group_id=i.id)}}">Check the items</a>
         </div>
         {% endfor %}

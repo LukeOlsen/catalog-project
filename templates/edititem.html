@@ -7,7 +7,8 @@
             <input type="text" size="10" name="price" placeholder="{{item.price}}">
             <input type="text" size="10" name="color" placeholder="{{item.color}}">
             <input type="text" size="10" name="size" placeholder="{{item.size}}">
+            <input type="submit" value="change">
         </form>
-        <a href="{{url_for('renderItem', item_id = item.id)}}">Back to item</a>
+        <a href="{{url_for('renderSingleItem', item_id = item.id)}}">Back to item</a>
     </body>
 </html>
