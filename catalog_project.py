@@ -15,6 +15,8 @@ import json
 from flask import make_response
 import requests
 
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
+
 engine = create_engine('sqlite:///clothingstore.db?check_same_thread=False')
 Base.metadata.bind = engine
 
@@ -27,6 +29,85 @@ def showLogin():
                     string.digits) for x in xrange(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
+
+@app.route('/gconnect', methods=['POST'])
+def gconnect():
+    if request.args.get('state') != login_session['state']:
+        response = make_response(json.dumps('Invalid state parameter'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    code = request.data
+    try:
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow.redirect_uri = 'postmessage'
+        credentials = oauth_flow.step2_exchange(code)
+    except FlowExchangeError:
+        response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    access_token = credentials.access_token
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
+    h = httplib2.Http()
+    result = json.loads(h.request(url, 'GET')[1])
+    if result.get('error') is not None:
+        response.headers['Content-Type'] = 'application/json'
+    gplus_id = credentials.id_token['sub']
+    if result['user_id'] != gplus_id:
+        response = make_response(json.dumps("Token's user ID doesn't match given user ID"), 401)
+        print "Token's ID doesn't match client's ID"
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    stored_credentials = login_session.get('credentials')
+    stored_gplus_id = login_session.get('gplus_id')
+    if stored_credentials is not None and gplus_id == stored_gplus_id:
+        response = make_response(json.dumps('Current user is already connected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+    login_session['credentials'] = credentials.access_token
+    login_session['gplus-id'] = gplus_id
+    userinfo_url = "https://www.googleapis.com/oauth2/v1/userinfo"
+    params={'access_token': credentials.access_token, 'alt': 'json'}
+    answer = requests.get(userinfo_url, params=params)
+    data = json.loads(answer.text)
+    login_session['username'] = data['name']
+    login_session['picture'] = data['picture']
+    login_session['email'] = data['email']
+
+    output = ''
+    output += '<h1>Welcome, '
+    output += login_session['username']
+    output += '</h1>'
+
+    return output
+
+@app.route('/gdisconnect')
+def gdisconnect():
+    access_token = login_session.get('access_token')
+    if access_token is None:
+        print 'Access Token is None'
+        response = make_response(json.dumps('Current user not connected.'), 401)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    print 'In gdisconnect access token is %s', access_token
+    print 'User name is: '
+    print login_session['username']
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    h = httplib2.Http()
+    result = h.request(url, 'GET')[0]
+    print 'result is '
+    print result
+    if result['status'] == '200':
+        del login_session['access_token']
+        del login_session['gplus_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response.headers['Content-Type'] = 'application/json'
+        return response
+    else:
+        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response.headers['Content-Type'] = 'application/json'
+        return response
 
 @app.route('/')
 def sayHello():
@@ -50,6 +131,8 @@ def renderSingleItem(item_id):
 
 @app.route('/clothing/newItemGroup/', methods=['GET', 'POST'])
 def addNewItemGroup():
+    if 'username' not in login_session:
+        return redirect('/login')
     if request.method == 'POST':
         newItemGroup = ClothingGroup(name = request.form['name'])
         session.add(newItemGroup)
@@ -60,6 +143,8 @@ def addNewItemGroup():
 
 @app.route('/clothing/<int:clothing_group_id>/newItem', methods=['GET', 'POST'])
 def addNewItem(clothing_group_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     clothing_group = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
     if request.method == 'POST':
         newItem = ClothingItem(name=request.form['name'], description=request.form['description'], price=request.form['price'],
@@ -72,6 +157,8 @@ def addNewItem(clothing_group_id):
 
 @app.route('/clothing/<int:clothing_group_id>/edit', methods=['GET', 'POST'])
 def editItemGroup(clothing_group_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     itemGroup = session.query(ClothingGroup).filter_by(id=clothing_group_id).one()
     if request.method == 'POST':
         itemGroup.name = request.form['name']
@@ -83,6 +170,8 @@ def editItemGroup(clothing_group_id):
 
 @app.route('/clothing/item/<int:item_id>/edit', methods=['GET', 'POST'])
 def editItem(item_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     changedItem = session.query(ClothingItem).filter_by(id = item_id).one()
     if request.method == 'POST':
         if request.form['name']:
@@ -103,6 +192,8 @@ def editItem(item_id):
 
 @app.route('/clothing/<int:clothing_group_id>/delete', methods=['GET', 'POST'])
 def deleteItemGroup(clothing_group_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     deletedItemGroup = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
     if request.method == 'POST':
         session.delete(deletedItemGroup)
@@ -113,6 +204,8 @@ def deleteItemGroup(clothing_group_id):
 
 @app.route('/clothing/item/<int:item_id>/delete', methods=['GET', 'POST'])
 def deleteItem(item_id):
+    if 'username' not in login_session:
+        return redirect('/login')
     deletedItem = session.query(ClothingItem).filter_by(id = item_id).one()
     if request.method == 'POST':
         session.delete(deletedItem)
