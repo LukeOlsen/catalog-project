@@ -5,11 +5,21 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 Base = declarative_base()
 
+class User(Base):
+    __tablename__ = 'user'
+
+    name = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+    picture = Column(String(250))
+    id = Column(Integer, primary_key=True)
+
 class ClothingGroup(Base):
     __tablename__ = 'clothing_group'
 
     name = Column(String(40), nullable = False)
     id = Column(Integer, primary_key = True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
 class ClothingItem(Base):
     __tablename__ = 'clothing_item'
@@ -22,7 +32,8 @@ class ClothingItem(Base):
     price = Column(String(8))
     item_group_id = Column(Integer, ForeignKey('clothing_group.id'))
     clothing_group = relationship(ClothingGroup)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
-
-engine = create_engine('sqlite:///clothingstore.db')
+engine = create_engine('sqlite:///clothingstorewithusers.db')
 Base.metadata.create_all(engine)
