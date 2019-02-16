@@ -97,6 +97,7 @@ def gconnect():
 
     if getUserID(login_session['email']) == None:
         createUser(login_session)
+        user = getUserInfo(login_session)
 
     output = ''
     output += '<h1>Welcome, '
@@ -139,40 +140,54 @@ def gdisconnect():
 
 @app.route('/')
 def sayHello():
-<<<<<<< HEAD
     if login_session:
-        name = login_session['username']
+        if 'username' in login_session:
+            user_id = getUserID(login_session['email'])
+            user = getUserInfo(user_id)
+            print user
+            print login_session
+            return render_template('hello.html', user=user)
+        else: 
+            return render_template('hellogeneral.html')
     else:
-        name='Guest'
-    return render_template('hello.html', name=name)
-||||||| merged common ancestors
-    if login_session['username'] is not None:
-        name = login_session['username']
-    return render_template('hello.html', name=name)
-=======
-    return render_template('hello.html')
->>>>>>> 3e6c93d3849c2e2325fec220d86ef3f4b502c83c
+        return render_template('hellogeneral.html')
 
 @app.route('/clothing/')
 def renderItemGroups():
     item_groups = session.query(ClothingGroup).all()
-    return render_template('groups.html', item_groups = item_groups)
+    if login_session:
+        if 'username' in login_session:
+            return render_template('groups.html', item_groups = item_groups)
+        else: 
+            return render_template('groupsgeneral.html', item_groups = item_groups)
 
 @app.route('/clothing/<int:clothing_group_id>/')
 def renderItemGroupList(clothing_group_id):
     item_group = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
     items = session.query(ClothingItem).filter_by(item_group_id=clothing_group_id).all()
-    return render_template('itemlist.html', items = items, item_group = item_group)
+    if login_session:
+        if 'username' in login_session:
+            return render_template('itemlist.html', items = items, item_group = item_group)
+        else:
+            return render_template('itemlistgeneral.html', items = items, item_group = item_group)
+    else:
+        return render_template('itemlistgeneral.html', items = items, item_group = item_group)
 
 @app.route('/clothing/item/<int:item_id>/')
 def renderSingleItem(item_id):
     item = session.query(ClothingItem).filter_by(id=item_id).one()
-    return render_template('item.html', item = item)
+    if login_session:
+        if 'username' in login_session:
+            return render_template('item.html', item = item)
+        else: 
+            return render_template('itemgeneral.html', item = item)
+    else:
+        return render_template('itemgeneral.html', item = item)
 
 @app.route('/clothing/newItemGroup/', methods=['GET', 'POST'])
 def addNewItemGroup():
     if 'username' not in login_session:
-        return redirect('/login')
+        return redirect(url_for('/login'))
     if request.method == 'POST':
         newItemGroup = ClothingGroup(name = request.form['name'])
         session.add(newItemGroup)
