@@ -1,0 +1,12 @@
+<html>
+
+<body>
+    <h1>{{item.name}}</h1>
+    <h4>{{item.description}}</h4>
+    <h4>{{item.price}}</h4>
+    <h4>{{item.size}}</h4>
+    <h4>{{item.color}}</h4>
+    <a href="{{url_for('renderItemGroupList', clothing_group_id = item.item_group_id)}}">Back to categories</a>
+</body>
+
+</html>

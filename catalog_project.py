@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from catalog_database_setup import Base, ClothingGroup, ClothingItem
+from catalog_database_setup import Base, ClothingGroup, ClothingItem, User
 
 app = Flask(__name__)
 
@@ -17,11 +17,31 @@ import requests
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
-engine = create_engine('sqlite:///clothingstore.db?check_same_thread=False')
+engine = create_engine('sqlite:///clothingstorewithusers.db?check_same_thread=False')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserID(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
 
 @app.route('/login')
 def showLogin():
@@ -73,6 +93,11 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    #Search for previous user
+
+    if getUserID(login_session['email']) == None:
+        createUser(login_session)
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -114,11 +139,19 @@ def gdisconnect():
 
 @app.route('/')
 def sayHello():
+<<<<<<< HEAD
     if login_session:
         name = login_session['username']
     else:
         name='Guest'
     return render_template('hello.html', name=name)
+||||||| merged common ancestors
+    if login_session['username'] is not None:
+        name = login_session['username']
+    return render_template('hello.html', name=name)
+=======
+    return render_template('hello.html')
+>>>>>>> 3e6c93d3849c2e2325fec220d86ef3f4b502c83c
 
 @app.route('/clothing/')
 def renderItemGroups():

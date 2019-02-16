@@ -1,12 +1,17 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from catalog_database_setup import  Base, ClothingGroup, ClothingItem
-engine = create_engine('sqlite:///clothingstore.db')
+from catalog_database_setup import  Base, ClothingGroup, ClothingItem, User
+engine = create_engine('sqlite:///clothingstorewithusers.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+user1 = User(name="Manager", email="manager@clothing.com")
+
+session.add(user1)
+session.commit()
 
 group1 = ClothingGroup(name = "Pants")
 
