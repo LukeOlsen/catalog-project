@@ -35,5 +35,16 @@ class ClothingItem(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
+    @property
+    def serialize(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+            'color': self.color,
+            'price': self.price,
+        }
+
+
+
 engine = create_engine('sqlite:///clothingstorewithusers.db')
 Base.metadata.create_all(engine)
