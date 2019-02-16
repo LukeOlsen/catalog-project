@@ -114,8 +114,10 @@ def gdisconnect():
 
 @app.route('/')
 def sayHello():
-    if login_session['username'] is not None:
+    if login_session:
         name = login_session['username']
+    else:
+        name='Guest'
     return render_template('hello.html', name=name)
 
 @app.route('/clothing/')
