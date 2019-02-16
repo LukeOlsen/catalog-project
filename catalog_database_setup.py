@@ -21,6 +21,13 @@ class ClothingGroup(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
+    @property
+    def serialize(self):
+        return {
+            'name': self.name,
+            'id': self.id
+        }
+
 class ClothingItem(Base):
     __tablename__ = 'clothing_item'
 
@@ -38,10 +45,12 @@ class ClothingItem(Base):
     @property
     def serialize(self):
         return {
+            'id': self.id,
             'name': self.name,
             'description': self.description,
             'color': self.color,
             'price': self.price,
+            'clothing group id': self.item_group_id
         }
 
 

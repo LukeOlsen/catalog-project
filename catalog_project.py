@@ -161,6 +161,11 @@ def renderItemGroups():
         else: 
             return render_template('groupsgeneral.html', item_groups = item_groups)
 
+@app.route('/clothing/JSON')
+def itemGroupsJSON():
+    item_groups = session.query(ClothingGroup).all()
+    return jsonify(ClothingGroup=[i.serialize for i in item_groups])
+
 @app.route('/clothing/<int:clothing_group_id>/')
 def renderItemGroupList(clothing_group_id):
     item_group = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
