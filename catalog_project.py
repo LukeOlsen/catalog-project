@@ -97,7 +97,6 @@ def gconnect():
 
     if getUserID(login_session['email']) == None:
         createUser(login_session)
-        user = getUserInfo(login_session)
 
     output = ''
     output += '<h1>Welcome, '
@@ -250,6 +249,8 @@ def editItem(item_id):
             changedItem.color = request.form['color']
         if request.form['price']:
             changedItem.price = request.form['price']
+        if request.form['picture']:
+            changedItem.picture = request.form['picture']
         session.add(changedItem)
         session.commit()
         return redirect(url_for('renderSingleItem', item_id = changedItem.id))

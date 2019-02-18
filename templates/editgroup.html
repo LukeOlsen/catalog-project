@@ -1,9 +1,13 @@
 <html>
+    <head>
+        <link rel=stylesheet type=text/css href="{{url_for('static', filename='app.css')}}">
+    </head>
     <body>
-        <h1>Would you like to edit {{itemGroup.name}}</h1>
-        <form action="url_for('editItemGroup', clothing_group_id = clothingGroup.id)" method="POST">
-            <input type="submit" value="Delete">
+        <h1>Would you like to delete {{itemGroup.name}}</h1>
+        <form action="{{url_for('editItemGroup', clothing_group_id = itemGroup.id)}}" method="POST">
+            <input type="text" size="50" placeholder="{{itemGroup.name}}" name="name">
+            <input type="submit" value="edit">
         </form>
-        <a href="{{url_for('renderItemGroupList', clothing_group_id = itemGroup.name)}}">Go Back</a>
+        <a href="{{url_for('renderItemGroupList', clothing_group_id = itemGroup.id)}}">Go Back</a>
     </body>
 </html>

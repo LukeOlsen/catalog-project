@@ -1,14 +1,35 @@
 <html>
+    <head>
+        <link rel=stylesheet type=text/css href="{{url_for('static', filename='app.css')}}">
+    </head>
     <body>
         <h1>Would you like to edit {{item.name}}?</h1>
-        <form action="{{url_for('editItem', item_id=item.id)}}", method="POST">
-            <input type="text" size="30" name="name" placeholder="{{item.name}}">
-            <input type="text" size="300" name="description" placeholder="{{item.description}}">
-            <input type="text" size="10" name="price" placeholder="{{item.price}}">
-            <input type="text" size="10" name="color" placeholder="{{item.color}}">
-            <input type="text" size="10" name="size" placeholder="{{item.size}}">
-            <input type="submit" value="change">
-        </form>
+        <div>
+            <form action="{{url_for('editItem', item_id=item.id)}}", method="POST">
+            <div class="inputDisplay">
+                <div>
+                    <label>Name:       </label><input type="text" size="30" name="name" placeholder="{{item.name}}">
+                </div>
+                <div>
+                    <label>Description:</label> <input type="text" size="300" name="description" placeholder="{{item.description}}">
+                </div>
+                <div>
+                    <label>Price:      </label> <input type="text" size="10" name="price" placeholder="{{item.price}}">
+                </div>
+                <div>
+                    <label>Color:      </label> <input type="text" size="10" name="color" placeholder="{{item.color}}">
+                <div>
+                    <label>Size:       </label> <input type="text" size="10" name="size" placeholder="{{item.size}}">
+                </div>
+                <div>
+                    <label>Picture:       </label> <input type="text" size="10" name="picture" placeholder="{{item.picture}}">
+                </div>
+                <div>
+                    <input type="submit" value="change">
+                </div>
+            </div>
+            </form>
+        </div>
         <a href="{{url_for('renderSingleItem', item_id = item.id)}}">Back to item</a>
     </body>
 </html>

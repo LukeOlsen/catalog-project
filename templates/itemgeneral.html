@@ -1,12 +1,32 @@
 <html>
+    <head>
+        <link rel=stylesheet type=text/css href="{{url_for('static', filename='app.css')}}">
+    </head>
 
-<body>
-    <h1>{{item.name}}</h1>
-    <h4>{{item.description}}</h4>
-    <h4>{{item.price}}</h4>
-    <h4>{{item.size}}</h4>
-    <h4>{{item.color}}</h4>
-    <a href="{{url_for('renderItemGroupList', clothing_group_id = item.item_group_id)}}">Back to categories</a>
-</body>
+    <body>
+        <div class="introBar">
+            <a class="logButton" href="{{url_for('renderItemGroupList', clothing_group_id = item.item_group_id)}}">Back</a>
+            <a class="logButton" href="{{url_for('showLogin')}}">Login</a>
+        </div>
+        <div class="mainItemDisplay">
+            <div class="itemMainCard">
+                <img src="{{item.picture}}" height="400" width="400">
+                <h1>{{item.name}}</h1>
+                <div class="itemMainDetailsDisplay">
+                    <div class="itemMainDetails">
+                        <h4>{{item.description}}</h4>
+                        <h4>{{item.price}}</h4>
+                        {% if item.size %}
+                            <h4>{{item.size}}</h4>
+                        {% endif %}
+                        {% if item.color %}
+                            <h4>{{item.color}}</h4>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+    </body>
 
 </html>

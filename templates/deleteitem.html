@@ -1,4 +1,7 @@
 <html>
+    <head>
+        <link rel=stylesheet type=text/css href="{{url_for('static', filename='app.css')}}">
+    </head>
     <body>
         <h1>Do you want to delete {{item.name}}</h1>
         <form action="{{url_for('deleteItem', item_id = item.id)}}", method="POST">

@@ -1,16 +1,23 @@
 <html>
-    <body>
-        <a href="{{url_for('gdisconnect')}}">Logout</a>
-        <h1>A list of the items in the group</h1>
-        <p>{{items[0].item_group_id}}</p>
+    <head>
+        <link rel=stylesheet type=text/css href="{{url_for('static', filename='app.css')}}">
+    </head>
 
-        {% for i in items%}
-        <div>
-            <p>{{i.name}}</p>
-            <p>see more <a href="{{url_for('renderSingleItem', item_id=i.id)}}">here</a></p>
+    <body>
+        <div class="navArea">
+            <a class="logButton" href="{{url_for('renderItemGroups')}}">Back</a>
+            <a class="logButton" href="{{url_for('gdisconnect')}}">Logout</a>
         </div>
-        {% endfor %}
+        <h3>A list of the items in the group</h3>
+        <div class="itemPreviewDisplay">
+            {% for i in items%}
+            <div class="itemPreviewCard">
+                <img src="{{i.picture}}" height="150" width="150">
+                <p>{{i.name}}</p>
+                <p>see more <a href="{{url_for('renderSingleItem', item_id=i.id)}}">here</a></p>
+            </div>
+            {% endfor %}
+        </div>
         <a href="{{url_for('addNewItem', clothing_group_id = items[0].item_group_id)}}">Make new item.</a>
-        <a href="{{url_for('renderItemGroups')}}">Back to categories</a>
     </body>
 </html>

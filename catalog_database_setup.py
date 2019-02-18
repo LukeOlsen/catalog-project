@@ -37,6 +37,7 @@ class ClothingItem(Base):
     size = Column(String(10))
     color = Column(String(20))
     price = Column(String(8))
+    picture = Column(String(200))
     item_group_id = Column(Integer, ForeignKey('clothing_group.id'))
     clothing_group = relationship(ClothingGroup)
     user_id = Column(Integer, ForeignKey('user.id'))

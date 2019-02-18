@@ -1,4 +1,7 @@
 <html>
+    <head>
+        <link rel=stylesheet type=text/css href="{{url_for('static', filename='app.css')}}">
+    </head>
     <body>
         <h1>Do you want to delete the group {{itemGroup.name}}</h1>
         <form action="{{url_for('deleteItemGroup', clothing_group_id = itemGroup.id)}}" method="POST">
