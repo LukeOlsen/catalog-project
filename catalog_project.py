@@ -23,6 +23,8 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# Functions used for creating and reading user information during session
+
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
@@ -49,6 +51,8 @@ def showLogin():
                     string.digits) for x in xrange(32))
     login_session['state'] = state
     return render_template('login.html', STATE=state)
+
+#Authentication with google services
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -93,7 +97,8 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
-    #Search for previous user
+    #Search for previous user and if none exists save user information
+    #in user table.
 
     if getUserID(login_session['email']) == None:
         createUser(login_session)
@@ -104,6 +109,9 @@ def gconnect():
     output += '</h1>'
 
     return output
+
+#Disconnecting from google authentication service and wiping user information
+#from current session.
 
 @app.route('/gdisconnect')
 def gdisconnect():
@@ -139,7 +147,16 @@ def gdisconnect():
 
 @app.route('/')
 def sayHello():
+
+    #First check to see if user triggered a 
+    #login session
+
     if login_session:
+
+        #if user has initiated a login session check to see
+        #if username is present within the login session
+        #this will help determine if user is logged in or out
+
         if 'username' in login_session:
             user_id = getUserID(login_session['email'])
             user = getUserInfo(user_id)
@@ -199,7 +216,8 @@ def addNewItemGroup():
     if 'username' not in login_session:
         return redirect(url_for('/login'))
     if request.method == 'POST':
-        newItemGroup = ClothingGroup(name = request.form['name'])
+        user_id = getUserID(login_session['email'])
+        newItemGroup = ClothingGroup(name = request.form['name'], user_id = user_id)
         session.add(newItemGroup)
         session.commit()
         return redirect(url_for('renderItemGroups'))
@@ -209,11 +227,12 @@ def addNewItemGroup():
 @app.route('/clothing/<int:clothing_group_id>/newItem', methods=['GET', 'POST'])
 def addNewItem(clothing_group_id):
     if 'username' not in login_session:
-        return redirect('/login')
+        return redirect(url_for('showLogin'))
     clothing_group = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
     if request.method == 'POST':
+        user_id = getUserID(login_session['email'])
         newItem = ClothingItem(name=request.form['name'], description=request.form['description'], price=request.form['price'],
-                               size=request.form['size'], color=request.form['color'], item_group_id = clothing_group_id)
+                               size=request.form['size'], color=request.form['color'], item_group_id = clothing_group_id, user_id = user_id)
         session.add(newItem)
         session.commit()
         return redirect(url_for('renderItemGroupList', clothing_group_id = clothing_group.id))
@@ -222,9 +241,9 @@ def addNewItem(clothing_group_id):
 
 @app.route('/clothing/<int:clothing_group_id>/edit', methods=['GET', 'POST'])
 def editItemGroup(clothing_group_id):
+    itemGroup = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
     if 'username' not in login_session:
-        return redirect('/login')
-    itemGroup = session.query(ClothingGroup).filter_by(id=clothing_group_id).one()
+        return redirect(url_for('showLogin'))
     if request.method == 'POST':
         itemGroup.name = request.form['name']
         session.add(itemGroup)
@@ -260,7 +279,7 @@ def editItem(item_id):
 @app.route('/clothing/<int:clothing_group_id>/delete', methods=['GET', 'POST'])
 def deleteItemGroup(clothing_group_id):
     if 'username' not in login_session:
-        return redirect('/login')
+        return redirect(url_for('showLogin'))
     deletedItemGroup = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
     if request.method == 'POST':
         session.delete(deletedItemGroup)
@@ -272,7 +291,7 @@ def deleteItemGroup(clothing_group_id):
 @app.route('/clothing/item/<int:item_id>/delete', methods=['GET', 'POST'])
 def deleteItem(item_id):
     if 'username' not in login_session:
-        return redirect('/login')
+        return redirect(url_for('showLogin'))
     deletedItem = session.query(ClothingItem).filter_by(id = item_id).one()
     if request.method == 'POST':
         session.delete(deletedItem)

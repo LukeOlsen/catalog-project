@@ -18,6 +18,7 @@ class ClothingGroup(Base):
 
     name = Column(String(40), nullable = False)
     id = Column(Integer, primary_key = True)
+    picture = Column(String(300))
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
