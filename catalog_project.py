@@ -244,6 +244,9 @@ def editItemGroup(clothing_group_id):
     itemGroup = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
     if 'username' not in login_session:
         return redirect(url_for('showLogin'))
+    user_id = getUserID(login_session['email'])
+    if itemGroup.user_id != user_id:
+        return redirect(url_for('renderItemGroups'))
     if request.method == 'POST':
         itemGroup.name = request.form['name']
         session.add(itemGroup)
@@ -257,6 +260,9 @@ def editItem(item_id):
     if 'username' not in login_session:
         return redirect('/login')
     changedItem = session.query(ClothingItem).filter_by(id = item_id).one()
+    user_id = getUserID(login_session['email'])
+    if changedItem.user_id != user_id:
+        return redirect(url_for('renderSingleItem', item_id = changedItem.id))
     if request.method == 'POST':
         if request.form['name']:
             changedItem.name = request.form['name']
@@ -281,6 +287,9 @@ def deleteItemGroup(clothing_group_id):
     if 'username' not in login_session:
         return redirect(url_for('showLogin'))
     deletedItemGroup = session.query(ClothingGroup).filter_by(id = clothing_group_id).one()
+    user_id = getUserID(login_session['email'])
+    if deletedItemGroup.user_id != user_id:
+        return redirect(url_for('renderItemGroups'))
     if request.method == 'POST':
         session.delete(deletedItemGroup)
         session.commit()
@@ -293,6 +302,9 @@ def deleteItem(item_id):
     if 'username' not in login_session:
         return redirect(url_for('showLogin'))
     deletedItem = session.query(ClothingItem).filter_by(id = item_id).one()
+    user_id = getUserID(login_session['email'])
+    if deletedItem.user_id != user_id:
+        return render(url_for('renderSingleItem', item_id = deletedItem.id))
     if request.method == 'POST':
         session.delete(deletedItem)
         session.commit()
