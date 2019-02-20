@@ -1,19 +1,19 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask import Flask, render_template, request
+from flask import redirect, url_for, flash, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from catalog_database_setup import Base, ClothingGroup, ClothingItem, User
-
-app = Flask(__name__)
-
 from flask import session as login_session
-import random, string
-
+import random
+import string
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 import json
 from flask import make_response
 import requests
+
+app = Flask(__name__)
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
@@ -24,6 +24,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 # Functions used for creating and reading user information during session
+
 
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
