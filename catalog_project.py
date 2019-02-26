@@ -221,10 +221,10 @@ def renderItemGroupList(clothing_group_id):
 
 @app.route('/clothing/<int:clothing_group_id>/JSON')
 def renderItemGroupListJSON(clothing_group_id):
-    item_group = session.query(ClothingGroup)
-    .filter_by(id=clothing_group_id).one()
-    items = session.query(ClothingItem)
-    .filter_by(item_group_id=clothing_group_id).all()
+    item_group = session.query(ClothingGroup
+                               ).filter_by(id=clothing_group_id).one()
+    items = session.query(ClothingItem
+                          ).filter_by(item_group_id=clothing_group_id).all()
     return jsonify(ClothingItem=[i.serialize for i in items])
 
 
@@ -260,8 +260,8 @@ def addNewItemGroup():
 def addNewItem(clothing_group_id):
     if 'username' not in login_session:
         return redirect(url_for('showLogin'))
-    clothing_group = session.query(ClothingGroup)
-    .filter_by(id=clothing_group_id).one()
+    clothing_group = session.query(ClothingGroup
+                                   ).filter_by(id=clothing_group_id).one()
     if request.method == 'POST':
         user_id = getUserID(login_session['email'])
         newItem = ClothingItem(name=request.form['name'],
@@ -281,12 +281,13 @@ def addNewItem(clothing_group_id):
 
 @app.route('/clothing/<int:clothing_group_id>/edit', methods=['GET', 'POST'])
 def editItemGroup(clothing_group_id):
-    itemGroup = session.query(ClothingGroup)
-    .filter_by(id=clothing_group_id).one()
+    itemGroup = session.query(ClothingGroup
+                              ).filter_by(id=clothing_group_id).one()
     if 'username' not in login_session:
         return redirect(url_for('showLogin'))
     user_id = getUserID(login_session['email'])
     if itemGroup.user_id != user_id:
+        flash("You are not the owner of that group.")
         return redirect(url_for('renderItemGroups'))
     if request.method == 'POST':
         itemGroup.name = request.form['name']
@@ -304,6 +305,7 @@ def editItem(item_id):
     changedItem = session.query(ClothingItem).filter_by(id=item_id).one()
     user_id = getUserID(login_session['email'])
     if changedItem.user_id != user_id:
+        flash("You are not the owner of this item.")
         return redirect(url_for('renderSingleItem', item_id=changedItem.id))
     if request.method == 'POST':
         if request.form['name']:
@@ -329,10 +331,11 @@ def editItem(item_id):
 def deleteItemGroup(clothing_group_id):
     if 'username' not in login_session:
         return redirect(url_for('showLogin'))
-    deletedItemGroup = session.query(ClothingGroup)
-    .filter_by(id=clothing_group_id).one()
+    deletedItemGroup = session.query(ClothingGroup
+                                     ).filter_by(id=clothing_group_id).one()
     user_id = getUserID(login_session['email'])
     if deletedItemGroup.user_id != user_id:
+        flash("You are not the owner of that group.")
         return redirect(url_for('renderItemGroups'))
     if request.method == 'POST':
         session.delete(deletedItemGroup)
@@ -350,7 +353,8 @@ def deleteItem(item_id):
     deletedItem = session.query(ClothingItem).filter_by(id=item_id).one()
     user_id = getUserID(login_session['email'])
     if deletedItem.user_id != user_id:
-        return render(url_for('renderSingleItem', item_id=deletedItem.id))
+        flash("You are not the owner of this item.")
+        return redirect(url_for('renderSingleItem', item_id=deletedItem.id))
     if request.method == 'POST':
         session.delete(deletedItem)
         session.commit()

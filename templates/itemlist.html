@@ -9,6 +9,15 @@
             <a class="logButton" href="{{url_for('gdisconnect')}}">Logout</a>
         </div>
         <h3>A list of the items in the group</h3>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
         <div class="itemPreviewDisplay">
             {% for i in items%}
             <div class="itemPreviewCard">
@@ -18,6 +27,6 @@
             </div>
             {% endfor %}
         </div>
-        <a href="{{url_for('addNewItem', clothing_group_id = items[0].item_group_id)}}">Make new item.</a>
+        <a href="{{url_for('addNewItem', clothing_group_id = item_group.id)}}">Make new item.</a>
     </body>
 </html>
